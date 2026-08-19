@@ -18,9 +18,12 @@
 ::-webkit-scrollbar-thumb:hover{background-image:linear-gradient(180deg,var(--primary),var(--accent));border-width:2px}
 ::-webkit-scrollbar-thumb:active{background-image:linear-gradient(180deg,var(--primary),var(--primary))}
 ::-webkit-scrollbar-corner{background:transparent}
-*{box-sizing:border-box}html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),var(--surface));color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}html,body{margin:0;padding:0;max-width:100%;overflow-x:hidden;background:linear-gradient(180deg,var(--bg),var(--surface));color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.grid,.mjx-grid,.mjx-measure,.mjx-hg-stats,.event-grid,.mjx-furniture,.calendar,.split{min-width:0}
+.grid>*,.mjx-grid>*,.mjx-measure>*,.event-grid>*,.mjx-furniture>*,.split>*{min-width:0}
+input[type="date"],input[type="time"]{min-width:0;max-width:100%}
 button,input,select,textarea{font:inherit}button{cursor:pointer;border:0}.hidden{display:none!important}.muted{color:var(--muted)}
-.app{min-height:100vh;display:grid;grid-template-columns:250px 1fr}.sidebar{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid var(--border);background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(16px);display:flex;flex-direction:column;gap:14px}
+.app{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:250px 1fr}.sidebar{position:sticky;top:0;height:100vh;height:100dvh;padding:22px 14px;border-right:1px solid var(--border);background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:blur(16px);display:flex;flex-direction:column;gap:14px}
 .brand{padding:10px 12px 14px}.brand h1{font-family:Georgia,serif;margin:0;font-size:24px}.brand p{margin:7px 0 0;color:var(--muted);font-size:12px}.nav{display:flex;flex-direction:column;gap:6px;overflow-y:auto;overflow-x:visible;padding-right:2px;padding-left:6px}.nav button{background:transparent;color:var(--muted);padding:11px 12px;border-radius:15px;text-align:left;display:flex;align-items:center;gap:10px;height:44px}.nav button:hover,.nav button.active{background:var(--surface2);color:var(--text)}.nav button::before{content:"";position:absolute;left:-1.2px;top:-0.6px;height:22px;width:27px;border-style:solid;border-color:color-mix(in srgb,var(--primary) 82%,var(--accent) 18%);border-left-width:5.5px;border-top-width:1.6px;border-bottom:none;border-radius:15.8px 0 0 0;background:transparent;z-index:-1;opacity:0;transform:scaleY(.88);transform-origin:bottom;-webkit-mask-image:linear-gradient(to right,black 30%,rgba(0,0,0,.55) 58%,rgba(0,0,0,.18) 80%,transparent 98%);mask-image:linear-gradient(to right,black 30%,rgba(0,0,0,.55) 58%,rgba(0,0,0,.18) 80%,transparent 98%);box-shadow:0 0 1px 0 color-mix(in srgb,var(--primary) 70%,transparent),0 0 5px 0 color-mix(in srgb,var(--primary) 32%,transparent),0 0 14px 1px color-mix(in srgb,var(--accent) 22%,transparent);transition:opacity .28s ease,transform .28s cubic-bezier(.34,1.56,.64,1)}
 .nav button::after{content:"";position:absolute;left:-1.2px;bottom:-0.6px;height:22px;width:36px;border-style:solid;border-color:color-mix(in srgb,var(--primary) 82%,var(--accent) 18%);border-left-width:5.5px;border-bottom-width:1.6px;border-top:none;border-radius:0 0 0 15.8px;background:transparent;z-index:-1;opacity:0;transform:scaleY(.88);transform-origin:top;-webkit-mask-image:linear-gradient(to right,black 42%,rgba(0,0,0,.55) 65%,rgba(0,0,0,.18) 85%,transparent 99%);mask-image:linear-gradient(to right,black 42%,rgba(0,0,0,.55) 65%,rgba(0,0,0,.18) 85%,transparent 99%);box-shadow:0 0 1px 0 color-mix(in srgb,var(--primary) 70%,transparent),0 0 5px 0 color-mix(in srgb,var(--primary) 32%,transparent),0 0 14px 1px color-mix(in srgb,var(--accent) 22%,transparent);transition:opacity .28s ease,transform .28s cubic-bezier(.34,1.56,.64,1)}
 .nav button.active::before,.nav button.active::after{opacity:.9;transform:scaleY(1)}
@@ -2922,6 +2925,8 @@ function ensure(){
   data.mjx.collections=data.mjx.collections||{};
   data.mjx.mystery=data.mjx.mystery||{date:'',opened:false};
   data.mjx.academy=data.mjx.academy||{done:[],lastOnline:''};
+  data.mjx.academy.quiz=data.mjx.academy.quiz||{};
+  data.mjx.academy.filterCat=data.mjx.academy.filterCat||'all';
   data.mjx.lab=data.mjx.lab||{lastQuery:'',history:[]};
   data.mjx.hair=data.mjx.hair||{goal:60,baseLength:0,entries:[]};
   data.mjx.season=data.mjx.season||{lastRefresh:''};
@@ -2986,22 +2991,83 @@ function shopCard2(item){const own=data.shop?.owned?.includes(item.id);const src
 function mysteryPage(){ensure();const today=new Date().toISOString().slice(0,10);const ready=data.mjx.mystery.date!==today||!data.mjx.mystery.opened;return `<div class="mjx-shell"><section class="card hero"><div class="row between wrap"><div><div class="label">Ежедневный подарок</div><h1 style="font-family:Georgia,serif;margin:4px 0">🎁 Бьюти-коробка</h1><p>Одна коробочка в день. Внутри всегда что-то приятное.</p></div><span class="tag">${ready?'Доступна сегодня':'Завтра будет новая'}</span></div></section><section class="mjx-box ${ready?'':'open'}" id="mjxMysteryBox"><div class="gift">${ready?'🎁':'✨'}</div><p>${ready?'Открыть подарок':'Подарок уже получен сегодня ♡'}</p><div class="mjx-spark">${ready?'':''}</div></section><div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="mjxOpenBox" ${ready?'':'disabled'}>${ready?'Открыть Бьюти-коробка ✨':'Приходи завтра ♡'}</button></div><section class="card"><h3 class="section-title">Что может выпасть</h3><div class="grid grid-3"><div class="item">✨ XP</div><div class="item">💎 Редкий предмет</div><div class="item">🏠 Мебель</div><div class="item">🎀 Аксессуар</div><div class="item">🎨 Тема</div><div class="item">🐾 Бустер питомца</div><div class="item">🧴 Spa-средство питомца</div><div class="item">👑 Коллекционный предмет</div><div class="item">🌙 Секретная находка</div></div></section></div>`}
 function openMystery(){ensure();const today=new Date().toISOString().slice(0,10);if(data.mjx.mystery.date===today&&data.mjx.mystery.opened){toast('Бьюти-коробка уже открыта сегодня ♡');return}const pool=[{type:'xp',v:40,label:'+40 XP'},{type:'xp',v:80,label:'+80 XP'},{type:'pet',boost:12,label:'🐾 +12 счастья питомцу'},{type:'pet',boost:15,label:'🐾 +15 энергии питомца'},{type:'item',rarities:['Редкий','Эпический'],label:'💎 редкий предмет'},{type:'item',rarities:['Обычный','Редкий'],label:'🏠 мебель'},{type:'petitem',label:'🧴 spa-средство питомца'},{type:'theme',label:'🎨 пробная тема на сегодня'}];const r=pool[Math.floor(Math.random()*pool.length)];if(r.type==='xp')addXP(r.v,'Бьюти-коробка');if(r.type==='pet'){data.pet.happiness=Math.min(100,data.pet.happiness+r.boost);data.pet.energy=Math.min(100,data.pet.energy+r.boost)}if(r.type==='item'){const its=SHOP_CATALOG.filter(x=>!data.shop.owned.includes(x.id)&&r.rarities.includes(x.rarity)&&!window.__beautyShopOnlyIds?.has(x.id));const it=its[Math.floor(Math.random()*its.length)]||SHOP_CATALOG.find(x=>!window.__beautyShopOnlyIds?.has(x.id));if(it&&!data.shop.owned.includes(it.id))data.shop.owned.push(it.id)}if(r.type==='petitem'){const its=SHOP_CATALOG.filter(x=>x.type==='pet'&&!data.shop.owned.includes(x.id)&&!window.__beautyShopOnlyIds?.has(x.id));const it=its[Math.floor(Math.random()*its.length)]||SHOP_CATALOG.find(x=>x.type==='pet');if(it&&!data.shop.owned.includes(it.id))data.shop.owned.push(it.id)}if(r.type==='theme'){const freeThemes=SHOP_CATALOG.filter(x=>x.type==='theme'&&!window.__beautyShopOnlyIds?.has(x.id));data.mjx.tempTheme={until:today,item:freeThemes[Math.floor(Math.random()*freeThemes.length)]?.id||''}}data.mjx.mystery={date:today,opened:true};save2();toast('🎁 '+r.label);render()}
 
+const ACADEMY_CATS={skin:'Уход за кожей',hair:'Уход за волосами',routine:'Рутина'};
 const academyBase=[
-['Очищение без перегруза','Узнай, как выбирать мягкое очищение и не пересушивать кожу.','очищение','Очищение кожи'],
-['Увлажнение','Почему увлажнение важно даже при жирной коже и как подобрать комфортную текстуру.','увлажнение','Увлажнение кожи'],
-['SPF каждый день','Как встроить фотозащиту в ежедневную рутину и не забывать про повторное нанесение.','spf','Солнцезащитный крем'],
-['Ниацинамид','Разбираемся, зачем он нужен в уходе и как аккуратно начать.','ниацинамид','Ниацинамид'],
-['Гиалуроновая кислота','Что она делает и почему влажная кожа может чувствовать себя комфортнее.','гиалуроновая кислота','Гиалуроновая кислота'],
-['Керамиды','Как поддерживать кожный барьер и чем полезны керамиды.','керамиды','Керамид'],
-['Ретиноиды','Базовая теория о ретиноидах и почему постепенность важнее количества.','ретинол','Ретинол'],
-['Кислоты','AHA/BHA: разные задачи, аккуратный ввод и важность переносимости.','кислоты','AHA'],
-['Маски','Как понять, нужна ли тебе дополнительная маска и как не перегружать рутину.','маски','Маска для лица'],
-['Термозащита','Зачем она нужна при горячих укладках и как встроить её в hair-ритуал.','термозащита','Термозащита'],
-['Уход за длиной','Как уменьшать ломкость и поддерживать мягкость длины.','волосы','Уход за волосами'],
-['Кожа головы','Базовые принципы мягкого ухода за кожей головы.','кожа головы','Кожа головы'],
-['Повреждённые волосы','Что помогает сократить механический стресс и сохранить длину.','поврежденные волосы','Повреждение волос'],
-['Окрашенные волосы','Как сохранить комфорт, блеск и бережное отношение к окрашенной длине.','окрашенные волосы','Окрашенные волосы'],
-['Beauty-ритуал','Как собрать короткую устойчивую рутину, которую реально хочется выполнять.','рутина красоты','Уход за кожей']
+{title:'Очищение без перегруза',short:'Как выбирать мягкое очищение и не пересушивать кожу.',cat:'skin',level:'Основы',query:'Очищение кожи',tailorSkin:['oily','combination','sensitive'],tailorHair:[],
+ points:['Умывание — это баланс: убрать себум/макияж, но не повредить защитный барьер.','Мягкие ПАВ (например, на основе бетаина) обычно комфортнее плотных мыльных основ.','Двойное очищение вечером полезно при плотном макияже/SPF, но не обязательно ежедневно.','После умывания кожа не должна «скрипеть» — это признак пересушивания.','Тёплая, а не горячая вода бережнее относится к барьеру кожи.'],
+ practice:'Сегодня замени горячую воду при умывании на комфортно тёплую и понаблюдай за ощущениями.',
+ myth:{claim:'Чем сильнее пенится очищение, тем лучше оно работает.',fact:'Обильная пена чаще связана с агрессивными ПАВ, а не с реальной эффективностью очищения.'},
+ quiz:{q:'Какой признак говорит, что очищение слишком агрессивное?',options:['Кожа увлажнена','Кожа «скрипит» и стянута','Кожа матовая'],correct:1,explain:'Стянутость и «скрип» после умывания — типичный признак нарушения барьера слишком сильным средством.'}},
+{title:'Увлажнение',short:'Почему увлажнение нужно даже жирной коже и как выбрать текстуру.',cat:'skin',level:'Основы',query:'Увлажнение кожи',tailorSkin:['oily'],tailorHair:[],
+ points:['Увлажнение нужно всем типам кожи — обезвоженность может провоцировать выработку себума.','Гели/лосьоны комфортнее для жирной и комбинированной кожи, плотные кремы — для сухой.','Гумектанты (гиалуроновая кислота, глицерин) удерживают воду, эмоленты и окклюзивы — «запечатывают» её.','Наносить увлажняющее средство эффективнее на слегка влажную кожу.','Смена сезона — повод пересмотреть текстуру крема, а не отменить увлажнение вовсе.'],
+ practice:'Проверь состав своего крема: найди гумектант (глицерин/гиалуроновая кислота) и что-то «запечатывающее» сверху.',
+ myth:{claim:'У жирной кожи не должно быть увлажняющего крема.',fact:'Отказ от увлажнения может усиливать выработку себума в ответ на обезвоженность кожи.'},
+ quiz:{q:'Зачем жирной коже увлажнение?',options:['Чтобы кожа блестела сильнее','Обезвоженность может провоцировать больше себума','Это не нужно'],correct:1,explain:'Кожа может компенсировать нехватку влаги повышенной выработкой себума — увлажнение помогает этого избежать.'}},
+{title:'SPF каждый день',short:'Как встроить фотозащиту в рутину и не забывать про повторное нанесение.',cat:'skin',level:'Основы',query:'Солнцезащитный крем',tailorSkin:[],tailorHair:[],
+ points:['UVA-лучи проникают через облака и стекло — SPF актуален и не в солнечную погоду.','Для лица обычно рекомендуют около 1/4–1/2 чайной ложки для равномерного покрытия.','Плотность нанесения важнее заявленного SPF-числа: тонкий слой не даёт заявленной защиты.','При долгом пребывании на солнце важно повторное нанесение.','Минеральный и химический фильтры отличаются по ощущениям на коже, но оба легитимны.'],
+ practice:'Отмерь привычную порцию SPF в ладони и сравни с рекомендуемым объёмом «на два пальца».',
+ myth:{claim:'Если сидишь дома у окна, SPF не нужен.',fact:'UVA-лучи проходят через стекло и постепенно влияют на кожу даже в помещении.'},
+ quiz:{q:'Что важнее для реальной защиты?',options:['Только число SPF на упаковке','Число SPF и достаточное количество нанесённого средства','Это не имеет значения'],correct:1,explain:'Даже высокий SPF не сработает как заявлено, если слой средства слишком тонкий.'}},
+{title:'Ниацинамид',short:'Зачем он нужен в уходе и как аккуратно начать использовать.',cat:'skin',level:'Практика',query:'Ниацинамид',tailorSkin:['oily','combination'],tailorHair:[],
+ points:['Ниацинамид (витамин B3) — один из самых универсальных и хорошо переносимых активов.','Часто выбирают для комфорта жирной/комбинированной кожи и более ровного тона.','Хорошо сочетается почти со всеми другими активами в рутине.','В готовых средствах обычно встречается в концентрации 2–10%.','Эффект накопительный — заметен через несколько недель регулярного использования.'],
+ practice:'Если пробуешь новый актив впервые — нанеси на небольшой участок кожи и понаблюдай сутки.',
+ myth:{claim:'Ниацинамид действует мгновенно, как масло для лица.',fact:'Как у большинства активов, эффект от ниацинамида накопительный и проявляется постепенно.'},
+ quiz:{q:'Как часто нужно использовать ниацинамид, чтобы заметить эффект?',options:['Один раз','Регулярно в течение нескольких недель','Через день один месяц'],correct:1,explain:'Активные компоненты обычно требуют регулярного применения — результат виден не сразу.'}},
+{title:'Гиалуроновая кислота',short:'Что она делает и почему важно закреплять её кремом сверху.',cat:'skin',level:'Практика',query:'Гиалуроновая кислота',tailorSkin:['dry','sensitive'],tailorHair:[],
+ points:['ГК — гумектант: притягивает и удерживает воду в верхних слоях кожи.','В сухом климате гумектант без «запечатывающего» крема сверху может вытягивать влагу из глубоких слоёв.','Разный молекулярный вес ГК по-разному распределяется в коже.','Комфортно сочетается практически с любым типом кожи и большинством активов.','Наносится на влажную кожу, сверху желательно закрепить кремом.'],
+ practice:'Нанеси сыворотку с гиалуроновой кислотой на влажную кожу и сразу же крем сверху.',
+ myth:{claim:'Гиалуроновой кислоты одной достаточно вместо крема.',fact:'Гумектанты работают лучше в паре с эмолентом/кремом, который удерживает влагу в коже.'},
+ quiz:{q:'На какую кожу лучше наносить сыворотку с гиалуроновой кислотой?',options:['На сухую','На слегка влажную','Без разницы'],correct:1,explain:'На влажной коже гумектанту есть что «притягивать» — эффект комфортнее.'}},
+{title:'Керамиды',short:'Как поддерживать кожный барьер и чем полезны керамиды.',cat:'skin',level:'Практика',query:'Керамид',tailorSkin:['dry','sensitive'],tailorHair:[],
+ points:['Керамиды — липиды, естественная часть «кирпичной кладки» защитного барьера кожи.','Ослабленный барьер часто проявляется чувствительностью, покраснением, стянутостью.','Средства с керамидами часто выбирают при сухости и после агрессивных процедур.','Хорошо сочетаются с холестерином и жирными кислотами в формуле.','Это поддерживающий компонент ухода, а не «лечение».'],
+ practice:'Если кожа сейчас чувствительна или шелушится — временно упрости рутину и добавь барьерный крем.',
+ myth:{claim:'Барьер кожи не восстанавливается, его нужно просто терпеть.',fact:'Барьер можно поддерживать и постепенно восстанавливать бережным уходом и упрощением рутины.'},
+ quiz:{q:'Когда особенно уместны средства с керамидами?',options:['После агрессивных процедур и при сухости','Только летом','Никогда не нужны'],correct:0,explain:'Керамиды помогают поддержать барьер именно тогда, когда он ослаблен.'}},
+{title:'Ретиноиды',short:'Базовая теория и почему постепенность важнее количества.',cat:'skin',level:'Практика',query:'Ретинол',tailorSkin:['normal','combination'],tailorHair:[],
+ points:['Ретиноиды — большая группа производных витамина A разной силы.','Начинать принято с невысокой частоты (1–2 раза в неделю), увеличивая по переносимости.','Повышают чувствительность кожи к солнцу — дневной SPF становится обязательным.','Первые недели возможна временная сухость — это ожидаемая адаптация.','Вопросы совместимости с беременностью/кормлением стоит обсуждать с врачом.'],
+ practice:'Если только начинаешь — выбери один вечер в неделю на старт и обязательно SPF утром.',
+ myth:{claim:'Чем чаще наносить ретинол, тем быстрее результат.',fact:'Слишком частое нанесение в начале чаще приводит к раздражению, а не к более быстрому эффекту.'},
+ quiz:{q:'Что обязательно нужно добавить в рутину при использовании ретиноидов?',options:['Дневной SPF','Дополнительный скраб','Ничего менять не нужно'],correct:0,explain:'Ретиноиды повышают чувствительность к солнцу, поэтому SPF днём становится обязательным.'}},
+{title:'Кислоты AHA/BHA',short:'Разные задачи, аккуратный ввод и важность переносимости.',cat:'skin',level:'Практика',query:'AHA',tailorSkin:['oily','combination'],tailorHair:[],
+ points:['AHA (гликолевая, молочная) работают больше на поверхности — подходят при сухости и неровном тоне.','BHA (салициловая) жирорастворима, проникает в поры — часто выбирают при жирной коже.','Начинать стоит с невысокой концентрации и 1–2 раз в неделю.','Не стоит сочетать несколько сильных кислотных продуктов в один вечер.','Как и с ретиноидами, дневной SPF обязателен при регулярном использовании кислот.'],
+ practice:'Проверь вечернюю рутину — кислоты обычно достаточно в одном продукте за раз, без наслоений.',
+ myth:{claim:'Кислоты можно применять хоть каждый день для быстрого результата.',fact:'Частое применение чаще приводит к раздражению барьера, чем к ускоренному результату.'},
+ quiz:{q:'Чем отличается BHA от AHA по механизму действия?',options:['BHA жирорастворима и проникает в поры','AHA работает только на волосах','Разницы нет'],correct:0,explain:'Жирорастворимость BHA позволяет ей проникать глубже в поры, что важно при жирной/проблемной коже.'}},
+{title:'Маски',short:'Как понять, нужна ли маска, и не перегружать рутину.',cat:'skin',level:'Основы',query:'Маска для лица',tailorSkin:[],tailorHair:[],
+ points:['Маска — дополнение к базовой рутине, а не её замена.','Тканевые маски в основном увлажняющие, глиняные — для себорегуляции, кремовые — питательные.','Частота обычно 1–2 раза в неделю, если иное не указано производителем.','Многослойность (маска + сыворотка + крем в один день) не всегда нужна.','Реакция кожи важнее рекламных обещаний — если сильно печёт, лучше смыть раньше.'],
+ practice:'В следующий раз засеки реальное время маски по инструкции, а не «на глаз».',
+ myth:{claim:'Если оставить маску подольше, эффект будет сильнее.',fact:'Передержка маски может пересушить или раздражить кожу вместо усиления эффекта.'},
+ quiz:{q:'Как часто обычно достаточно использовать увлажняющую маску?',options:['Каждый день','1–2 раза в неделю','Раз в полгода'],correct:1,explain:'Более частое использование редко даёт дополнительную пользу и может перегружать кожу.'}},
+{title:'Термозащита',short:'Зачем она нужна при горячих укладках и как встроить в рутину.',cat:'hair',level:'Основы',query:'Термозащита',tailorSkin:[],tailorHair:['damaged','colored'],
+ points:['Высокая температура утюжка/плойки разрушает связи в кератине и повреждает кутикулу волоса.','Термозащитный спрей создаёт барьер и снижает потерю влаги при нагреве.','Наносить термозащиту нужно до использования прибора, на чуть влажные или сухие волосы.','Более низкая температура при нескольких проходах часто бережнее одного прохода на максимуме.','Регулярная укладка без защиты — частая причина ломкости и посечённых кончиков.'],
+ practice:'Проверь температуру своего утюжка или фена — многие приборы позволяют снизить её без потери результата.',
+ myth:{claim:'Термозащита нужна только при очень сильном нагреве.',fact:'Даже фен на среднем режиме нагревает волос сильнее, чем кажется — защита полезна и при умеренных температурах.'},
+ quiz:{q:'Когда наносить термозащиту?',options:['После укладки','До использования нагревающего прибора','Раз в месяц'],correct:1,explain:'Термозащита работает как барьер и должна быть на волосах до контакта с горячим прибором.'}},
+{title:'Уход за длиной',short:'Как уменьшить ломкость и поддерживать мягкость волос.',cat:'hair',level:'Основы',query:'Уход за волосами',tailorSkin:[],tailorHair:[],
+ points:['Кончики — самая «старая» и уязвимая часть волоса, ей нужно больше питания.','Расчёсывание с кончиков вверх, а не с корней вниз, снижает механическое повреждение.','Расчёска с широкими зубьями бережнее к структуре волоса, чем частая металлическая щётка.','Регулярное подравнивание убирает уже посечённые участки, но не ускоряет рост.','Атласная наволочка снижает трение волос о ткань во время сна.'],
+ practice:'Сегодня попробуй расчёсывать волосы снизу вверх небольшими прядями.',
+ myth:{claim:'Частое подравнивание кончиков ускоряет рост волос.',fact:'Рост происходит из фолликула на коже головы и не зависит от состояния кончиков.'},
+ quiz:{q:'С какой стороны лучше начинать расчёсывать волосы?',options:['С корней','С кончиков','Не имеет значения'],correct:1,explain:'Начиная с кончиков, легче распутать волосы без лишнего натяжения и ломкости.'}},
+{title:'Кожа головы',short:'Базовые принципы мягкого ухода за кожей головы.',cat:'hair',level:'Основы',query:'Кожа головы',tailorSkin:[],tailorHair:['oily'],
+ points:['Кожа головы — тоже кожа: важен баланс очищения без пересушивания.','Частота мытья индивидуальна и зависит от типа кожи головы, а не жёсткого правила.','Лёгкий массаж при мытье помогает равномерно распределить шампунь.','Плотные стайлинговые средства у корней могут утяжелять волосы и ускорять загрязнение.','Зуд и шелушение кожи головы — повод обратить внимание на состав шампуня и уход в целом.'],
+ practice:'При следующем мытье головы удели 1–2 минуты лёгкому массажу подушечками пальцев.',
+ myth:{claim:'Частое мытьё головы всегда вредно.',fact:'Частота мытья должна подстраиваться под тип кожи головы, а не под общее правило для всех.'},
+ quiz:{q:'От чего в первую очередь должна зависеть частота мытья головы?',options:['От типа кожи головы','От дня недели','От длины волос'],correct:0,explain:'Жирность/сухость кожи головы — главный ориентир для частоты мытья, а не расписание.'}},
+{title:'Повреждённые волосы',short:'Что помогает сократить механический стресс и сохранить длину.',cat:'hair',level:'Практика',query:'Повреждение волос',tailorSkin:[],tailorHair:['damaged'],
+ points:['Механический стресс — тугие резинки, грубые полотенца, частая термоукладка — частая причина повреждений.','Влажный волос эластичнее, но и более уязвим к растяжению и ломкости.','Протеиновый и увлажняющий уход работают в паре: перебор одного без другого может навредить.','Микрофибра или хлопковая футболка вместо жёсткого полотенца снижают трение при сушке.','Регулярный бережный уход эффективнее одной «спасательной» маски раз в месяц.'],
+ practice:'Попробуй промакивать волосы полотенцем вместо интенсивного растирания.',
+ myth:{claim:'Волосы можно «вылечить» одной чудо-маской.',fact:'Восстановление структуры волоса — это регулярный уход, а не разовая процедура.'},
+ quiz:{q:'Какое состояние волоса делает его более уязвимым к растяжению?',options:['Сухое','Влажное','Не имеет значения'],correct:1,explain:'Мокрый волос более эластичен и легче повреждается при резком растяжении.'}},
+{title:'Окрашенные волосы',short:'Как сохранить блеск и бережно относиться к цвету.',cat:'hair',level:'Практика',query:'Окрашенные волосы',tailorSkin:[],tailorHair:['colored'],
+ points:['Окрашивание меняет структуру кутикулы, поэтому такие волосы требуют более бережного ухода.','Шампуни для окрашенных волос обычно мягче по составу и помогают дольше сохранять цвет.','Слишком горячая вода при мытье ускоряет вымывание пигмента.','УФ-излучение может влиять на стойкость цвета — актуальна защита волос на солнце.','Между окрашиваниями стоит выдерживать паузу, чтобы не перегружать структуру волоса.'],
+ practice:'В следующий раз промой волосы прохладной водой в конце мытья — это помогает сохранить блеск и цвет.',
+ myth:{claim:'Окрашенным волосам не нужен отдельный уход, если цвет держится.',fact:'Даже при стойком цвете структура волоса остаётся более уязвимой и нуждается в бережном уходе.'},
+ quiz:{q:'Что ускоряет вымывание цвета у окрашенных волос?',options:['Прохладная вода','Слишком горячая вода','Расчёсывание'],correct:1,explain:'Горячая вода приоткрывает кутикулу сильнее, и пигмент вымывается быстрее.'}},
+{title:'Beauty-ритуал',short:'Как собрать короткую устойчивую рутину, которую хочется выполнять.',cat:'routine',level:'Основы',query:'Уход за кожей',tailorSkin:[],tailorHair:[],
+ points:['Устойчивая рутина проще, чем кажется: очищение, увлажнение, SPF утром — уже хорошая база.','Новый активный компонент лучше добавлять по одному, чтобы понимать эффект или реакцию.','Рутина, которую реально хочется выполнять каждый день, работает лучше «идеальной», но слишком сложной.','Периодическая ревизия косметички помогает не копить лишнее и следить за сроками годности.','Прогресс обычно заметен в динамике недель, а не за один день.'],
+ practice:'Выбери сегодня 3 шага, без которых твоя рутина точно не обходится — и на время забудь про остальное.',
+ myth:{claim:'Чем больше шагов в рутине, тем лучше результат.',fact:'Простая понятная рутина, которую выполняешь регулярно, часто эффективнее перегруженной.'},
+ quiz:{q:'Что помогает понять, какой продукт дал эффект или реакцию?',options:['Добавлять всё сразу','Вводить новые активы по одному','Менять всю рутину каждую неделю'],correct:1,explain:'Один новый продукт за раз — единственный надёжный способ понять, что именно сработало.'}}
 ];
 const ACADEMY_SOURCES=[
 {title:'Как выбрать очищение без агрессии',url:'https://www.cosmo.ru/beauty/',source:'Cosmopolitan',text:'Разбор того, как подобрать мягкое средство для умывания и не пересушить кожу ежедневным уходом.'},
@@ -3020,10 +3086,59 @@ const ACADEMY_SOURCES=[
 {title:'Уход за окрашенными волосами',url:'https://www.cosmo.ru/beauty/hair/',source:'Cosmopolitan',text:'Советы, как сохранить блеск и бережно относиться к окрашенной длине.'},
 {title:'Как собрать простую бьюти-рутину',url:'https://www.elle.ru/krasota/',source:'ELLE',text:'Идеи короткой устойчивой рутины ухода, которую реально хочется выполнять.'}
 ];
-function academyPage(){ensure();const skin=data.settings.skinType,hair=data.settings.hairType;const pref=hair!=='normal'?`волосы ${hairTypeName(hair).toLowerCase()}`:`тип волос ${hairTypeName(hair).toLowerCase()}`;const online=Array.isArray(data.mjx.academy.online)?data.mjx.academy.online:[];return `<div class="mjx-shell"><div class="row between wrap"><div><h3 class="section-title">📚 Бьюти-академия</h3><p class="subtle">15 уроков, которые подстраиваются под твои предпочтения: кожа ${skinTypeName(skin).toLowerCase()}, ${pref}. Карточки автоматически дополняются свежими справками из интернета.</p></div><span class="tag">🎓 ${data.mjx.academy.done.length}/15</span></div><section class="card"><div class="row between"><div><h3 style="margin:0">Твой учебный маршрут</h3><p class="subtle">Онлайн-материалы подбираются по теме каждого урока.</p></div><button class="btn secondary small" id="mjxRefreshAcademy">↻ Обновить статьи</button></div></section><div class="mjx-grid mjx-grid-3">${academyBase.map((l,i)=>{const done=data.mjx.academy.done.includes(i);const tailored=(l[2].includes(skin)||l[2].includes(hair)||(['увлажнение','spf'].includes(l[2])));const web=online[i];return `<article class="card mjx-lesson" data-mjx-lesson="${i}"><div class="row between"><span class="tag">Урок ${i+1}</span><span class="tag">${done?'✓ Изучено':'+'+20+' XP'}</span></div><h3 style="margin:10px 0 5px">${esc2(l[0])}</h3><p class="subtle">${esc2(l[1])}</p>${tailored?'<span class="tag" style="margin-top:10px">♡ Под твоим профилем</span>':''}${web?`<div style="margin-top:12px;padding:12px;border-radius:16px;background:var(--surface2);border:1px solid var(--border)"><div class="label">🌐 Из интернета · ${esc2(web.source||'Подборка редакции')}</div><strong style="display:block;margin:5px 0">${esc2(web.title)}</strong><p class="subtle">${esc2(web.text||'').slice(0,260)}…</p><a class="btn secondary small" target="_blank" rel="noopener" href="${esc2(web.url)}">Читать статью</a></div>`:'<div class="item" style="margin-top:12px"><span class="subtle">🌐 Онлайн-статья подгружается…</span></div>'}</article>`}).join('')}</div></div>`}
+function academyPage(){
+ ensure();
+ const skin=data.settings.skinType,hair=data.settings.hairType;
+ const online=Array.isArray(data.mjx.academy.online)?data.mjx.academy.online:[];
+ const total=academyBase.length;
+ const doneCount=data.mjx.academy.done.length;
+ const quizCorrect=Object.values(data.mjx.academy.quiz||{}).filter(Boolean).length;
+ const pct=Math.round(doneCount/total*100);
+ const tier=doneCount>=total?['🏆','Мастер академии']:doneCount>=8?['🌿','Уверенный практик']:doneCount>=3?['🌱','Уже в деле']:['✨','Новичок академии'];
+ const cat=data.mjx.academy.filterCat||'all';
+ const cats=['all','skin','hair','routine'];
+ const filtered=academyBase.map((l,i)=>({l,i})).filter(x=>cat==='all'||x.l.cat===cat);
+ return `<div class="mjx-shell"><div class="row between wrap"><div><h3 class="section-title">📚 Бьюти-академия</h3><p class="subtle">${total} коротких уроков про уход за кожей и волосами — с мифами, практикой на каждый день и мини-тестом. Твой профиль: кожа ${skinTypeName(skin).toLowerCase()}, волосы ${hairTypeName(hair).toLowerCase()}.</p></div><span class="tag">${tier[0]} ${tier[1]}</span></div>
+<section class="card"><div class="row between wrap" style="gap:16px"><div style="flex:1;min-width:220px"><div class="row between"><strong>Прогресс курса</strong><span class="subtle">${doneCount}/${total} уроков</span></div><div class="progress" style="margin-top:8px"><i style="width:${pct}%"></i></div></div><div class="row wrap" style="gap:8px"><span class="tag">🧠 Тесты: ${quizCorrect}/${total}</span><button class="btn secondary small" id="mjxRefreshAcademy">↻ Обновить статьи</button></div></div></section>
+<div class="chip-tabs" id="mjxAcademyCats" style="margin-top:14px">${cats.map(c=>`<button class="${cat===c?'active':''}" data-mjx-acad-cat="${c}">${c==='all'?'Все уроки':ACADEMY_CATS[c]}</button>`).join('')}</div>
+<div class="mjx-grid mjx-grid-3" style="margin-top:14px">${filtered.map(({l,i})=>{const done=data.mjx.academy.done.includes(i);const quizOk=!!(data.mjx.academy.quiz&&data.mjx.academy.quiz[i]);const tailored=l.tailorSkin.includes(skin)||l.tailorHair.includes(hair);const web=online[i];return `<article class="card mjx-lesson" data-mjx-lesson="${i}"><div class="row between"><span class="tag">Урок ${i+1} · ${esc2(l.level)}</span><span class="tag">${done?'✓ Изучено':'+20 XP'}</span></div><h3 style="margin:10px 0 5px">${esc2(l.title)}</h3><p class="subtle">${esc2(l.short)}</p><div class="row wrap" style="margin-top:8px;gap:6px"><span class="tag">${ACADEMY_CATS[l.cat]}</span>${tailored?'<span class="tag">♡ Под твоим профилем</span>':''}${quizOk?'<span class="tag">🧠 Тест пройден</span>':''}</div>${web?`<div style="margin-top:12px;padding:12px;border-radius:16px;background:var(--surface2);border:1px solid var(--border)"><div class="label">🌐 Из интернета · ${esc2(web.source||'Подборка редакции')}</div><strong style="display:block;margin:5px 0">${esc2(web.title)}</strong><p class="subtle">${esc2(web.text||'').slice(0,200)}…</p><a class="btn secondary small" target="_blank" rel="noopener" href="${esc2(web.url)}" onclick="event.stopPropagation()">Читать статью</a></div>`:'<div class="item" style="margin-top:12px"><span class="subtle">🌐 Онлайн-статья подгружается…</span></div>'}</article>`}).join('')}</div></div>`;
+}
 function academyDaysSinceRefresh(){const ts=data.mjx.academy.lastOnline;if(!ts)return Infinity;return Math.floor((Date.now()-ts)/86400000)}
 async function refreshAcademy(force=false){if(!force&&Array.isArray(data.mjx.academy.online)&&data.mjx.academy.online.length>=15&&academyDaysSinceRefresh()<3)return;const box=document.getElementById('mjxAcademyOnline');if(box)box.innerHTML='<div class="empty">Подбираю свежие статьи по темам уроков…</div>';data.mjx.academy.online=academyBase.map((l,i)=>ACADEMY_SOURCES[i]?{...ACADEMY_SOURCES[i]}:null);data.mjx.academy.lastOnline=Date.now();save2();if(location.hash.replace('#','')==='academy'){renderPage('academy');toast('Статьи для карточек обновлены ♡')}}
-function openLesson(i){const l=academyBase[i];if(!data.mjx.academy.done.includes(i)){data.mjx.academy.done.push(i);addXP(20,'Урок академии');save2()}modal(`<h3>Урок ${i+1}: ${esc2(l[0])}</h3><p style="line-height:1.7">${esc2(l[1])}</p><div class="item"><strong>Твой профиль</strong><p>Кожа: ${esc2(skinTypeName(data.settings.skinType))}<br>Волосы: ${esc2(hairTypeName(data.settings.hairType))}</p></div><div class="modal-actions"><button class="btn" id="mjxLessonDone">Готово ✨</button></div>`);document.getElementById('mjxLessonDone').onclick=()=>{closeModal();location.hash='academy';if(location.hash.replace('#','')==='academy'){renderPage('academy')}}}
+function openLesson(i){
+ ensure();
+ const l=academyBase[i];
+ const already=data.mjx.academy.done.includes(i);
+ const online=Array.isArray(data.mjx.academy.online)?data.mjx.academy.online[i]:null;
+ modal(`<div class="row wrap" style="gap:6px;margin-bottom:8px"><span class="tag">Урок ${i+1}/${academyBase.length}</span><span class="tag">${ACADEMY_CATS[l.cat]}</span><span class="tag">${esc2(l.level)}</span></div>
+<h3>${esc2(l.title)}</h3>
+<p class="subtle" style="line-height:1.6">${esc2(l.short)}</p>
+<div class="item"><strong>Что важно знать</strong><ul style="margin:8px 0 0;padding-left:18px;line-height:1.7">${l.points.map(p=>`<li>${esc2(p)}</li>`).join('')}</ul></div>
+<div class="item" style="margin-top:10px"><strong>🔍 Миф vs факт</strong><p class="subtle" style="margin:8px 0 0;text-decoration:line-through">${esc2(l.myth.claim)}</p><p style="margin:4px 0 0">${esc2(l.myth.fact)}</p></div>
+<div class="item" style="margin-top:10px;background:var(--surface2)"><strong>✨ Практика на сегодня</strong><p style="margin:6px 0 0">${esc2(l.practice)}</p></div>
+${online?`<div class="item" style="margin-top:10px"><div class="label">🌐 Из интернета · ${esc2(online.source||'Подборка редакции')}</div><strong style="display:block;margin:5px 0">${esc2(online.title)}</strong><a class="btn secondary small" target="_blank" rel="noopener" href="${esc2(online.url)}">Читать статью</a></div>`:''}
+<div class="item" style="margin-top:10px" id="mjxQuizBox"><strong>🧠 Мини-тест</strong><p style="margin:8px 0">${esc2(l.quiz.q)}</p><div class="list" id="mjxQuizOpts">${l.quiz.options.map((o,oi)=>`<button class="btn secondary small" style="display:block;width:100%;text-align:left;margin-bottom:6px" data-mjx-quiz-opt="${oi}">${esc2(o)}</button>`).join('')}</div><p class="subtle" id="mjxQuizFeedback" style="margin-top:6px"></p></div>
+<div class="modal-actions"><button class="btn secondary" id="mjxLessonClose">Закрыть</button><button class="btn" id="mjxLessonDone">${already?'✓ Урок уже пройден':'Готово, я изучила урок ✨'}</button></div>`);
+ document.getElementById('mjxLessonClose').onclick=closeModal;
+ document.querySelectorAll('[data-mjx-quiz-opt]').forEach(b=>b.onclick=()=>{
+  const oi=Number(b.dataset.mjxQuizOpt);
+  const fb=document.getElementById('mjxQuizFeedback');
+  document.querySelectorAll('[data-mjx-quiz-opt]').forEach(x=>x.disabled=true);
+  if(oi===l.quiz.correct){
+   b.style.background='var(--success)';b.style.color='#fff';
+   if(!data.mjx.academy.quiz[i]){data.mjx.academy.quiz[i]=true;addXP(10,'Тест академии пройден');save2()}
+   if(fb)fb.innerHTML='✅ Верно! '+esc2(l.quiz.explain);
+  }else{
+   b.style.background='var(--danger)';b.style.color='#fff';
+   if(fb)fb.innerHTML='❌ Не совсем. '+esc2(l.quiz.explain);
+  }
+ });
+ document.getElementById('mjxLessonDone').onclick=()=>{
+  if(!data.mjx.academy.done.includes(i)){data.mjx.academy.done.push(i);addXP(20,'Урок академии');toast('Урок пройден ✨')}
+  save2();closeModal();
+  if(location.hash.replace('#','')==='academy'){renderPage('academy')}
+ };
+}
 
 const INCI={};
 const addInci=(keys,val)=>keys.forEach(k=>INCI[k.toLowerCase()]=val);
@@ -5262,7 +5377,7 @@ function bindMpx(route){
  document.querySelectorAll('[data-shop-day]').forEach(b=>b.onclick=()=>{const item=SHOP_CATALOG.find(x=>x.id===b.dataset.shopDay);if(!item)return;const price=Math.max(0,Math.floor(item.cost*.75));if(data.shop.owned.includes(item.id)){toast('Этот предмет уже у тебя ♡');return}if(data.xp<price){toast(`Не хватает ${price-data.xp} XP ♡`);return}data.xp-=price;data.shop.owned.push(item.id);save2();toast(`Получено: ${item.title} ✨`);render()});
  document.querySelectorAll('[data-mjx-filter]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-mjx-filter]').forEach(x=>x.classList.remove('active'));b.classList.add('active');const f=b.dataset.mjxFilter;document.querySelectorAll('#mjxShopGrid [data-mjx-shop-item]').forEach(card=>{const ok=f==='all'||(f==='rare'&&['Редкий','Эпический','Легендарный','Секретный'].includes(card.dataset.rarity))||card.dataset.type===f|| (f==='furniture'&&card.dataset.type==='furniture');card.style.display=ok?'':'none'})});
  if(route==='mystery')document.getElementById('mjxOpenBox')?.addEventListener('click',openMystery);
- if(route==='academy'){document.getElementById('mjxRefreshAcademy')?.addEventListener('click',()=>refreshAcademy(true));document.querySelectorAll('[data-mjx-lesson]').forEach(b=>b.onclick=()=>openLesson(Number(b.dataset.mjxLesson)));setTimeout(()=>refreshAcademy(false),0)}
+ if(route==='academy'){document.getElementById('mjxRefreshAcademy')?.addEventListener('click',()=>refreshAcademy(true));document.querySelectorAll('[data-mjx-lesson]').forEach(b=>b.onclick=()=>openLesson(Number(b.dataset.mjxLesson)));document.querySelectorAll('[data-mjx-acad-cat]').forEach(b=>b.onclick=()=>{ensure();data.mjx.academy.filterCat=b.dataset.mjxAcadCat;save2();renderPage('academy')});setTimeout(()=>refreshAcademy(false),0)}
  if(route==='lab'){document.getElementById('mjxLabForm')?.addEventListener('submit',e=>{e.preventDefault();doLab(document.getElementById('mjxInci').value)});document.getElementById('mjxOnlyProblem')?.addEventListener('click',()=>{const text=document.getElementById('mjxInci').value;const r=analyzeIngredients(text);document.getElementById('mjxLabResult').innerHTML=renderLabResult(r,true)});document.getElementById('mjxCheckOnline')?.addEventListener('click',()=>checkLabOnline());document.getElementById('mjxInternetIngredient')?.addEventListener('click',async()=>{
   const text=document.getElementById('mjxInci')?.value?.trim()||'';
   if(!text){toast('Сначала вставь состав ♡');return}
@@ -5573,10 +5688,12 @@ if (_origBindMpx && !window.__bindMpxPatched) {
   };
 }
 
-})();
-</script>
 
-<script id="smart-plan-events-delegation">
+
+// ===== merged from separate <script> tags to share closure scope =====
+
+// --- smart-plan-events-delegation ---
+
 document.addEventListener('click',function(ev){
   const planBtn=ev.target.closest('[data-build-smart-plan]');
   if(planBtn){renderSmartBeautyPlan();planBtn.textContent='✓ План обновлён';setTimeout(()=>{if(planBtn.isConnected)planBtn.textContent='✨ Собрать мой день'},1400);return;}
@@ -5587,8 +5704,10 @@ document.addEventListener('click',function(ev){
   const eventBtn=ev.target.closest('[data-event-toggle]');
   if(eventBtn){const st=window.ensureEventState?.(),key=eventBtn.dataset.eventToggle,i=st.selected.indexOf(key);if(i>=0)st.selected.splice(i,1);else st.selected.push(key);window.saveAfterEventState?.();window.renderAfterEventPanel?.();window.renderSmartBeautyPlan?.();}
 });
-</script>
-<script id="after-event-real-runtime">
+
+
+// --- after-event-real-runtime ---
+
 (function(){
   function isAfter(){ return (location.hash||'').replace(/^#/,'') === 'after-event'; }
   function bindEvents(){
@@ -5650,6 +5769,125 @@ document.addEventListener('click',function(ev){
   }, true);
 })();
 
+
+
+// --- tips-pro-upgrade ---
+
+// ================= TIPS TAB PRO UPGRADE =================
+// Добавляет поиск, фильтры по темам, избранное, стрик "совета дня" и "другой совет" —
+// поверх существующей логики, ничего из старого не удаляя.
+
+function ensureTipsProData(){
+  data.tipFavorites=Array.isArray(data.tipFavorites)?data.tipFavorites:[];
+  data.tipStreak=data.tipStreak&&typeof data.tipStreak==='object'?data.tipStreak:{lastDate:'',count:0,best:0};
+  data.tipChoice=data.tipChoice&&typeof data.tipChoice==='object'?data.tipChoice:{};
+  data.tipChoice.category=data.tipChoice.category||'all';
+  data.tipChoice.search=data.tipChoice.search||'';
+}
+
+const TIP_CAT_LABELS={spf:'☀️ SPF',hydration:'💧 Увлажнение',cleansing:'🧴 Очищение',hair:'💇 Волосы',sensitive:'🌸 Чувствительность',general:'✨ Общее'};
+function categorizeTipText(t){
+  const cats=[];
+  if(/spf|солнц|uv\b/i.test(t))cats.push('spf');
+  if(/увлажн|гиалурон/i.test(t))cats.push('hydration');
+  if(/очищ|умыван|пенк/i.test(t))cats.push('cleansing');
+  if(/волос|кондиционер|длин|кончик|шампун|фен|расчёс/i.test(t))cats.push('hair');
+  if(/раздраж|чувствит|аллерг|покраснен/i.test(t))cats.push('sensitive');
+  if(!cats.length)cats.push('general');
+  return cats;
+}
+
+function tipMarkDoneToday(){
+  ensureTipsProData();
+  const today=todayKey();
+  if(data.tipStreak.lastDate===today){toast('Уже отмечено сегодня ♡');return}
+  const yest=new Date();yest.setDate(yest.getDate()-1);
+  data.tipStreak.count=data.tipStreak.lastDate===localKey(yest)?(data.tipStreak.count||0)+1:1;
+  data.tipStreak.best=Math.max(data.tipStreak.best||0,data.tipStreak.count);
+  data.tipStreak.lastDate=today;
+  save();
+  playSound('win');
+  addXP(5,'Совет дня выполнен');
+  renderPage('tips');
+}
+
+function toggleTipFavorite(text){
+  ensureTipsProData();
+  const i=data.tipFavorites.indexOf(text);
+  if(i>=0){data.tipFavorites.splice(i,1);toast('Убрано из избранного');}
+  else{data.tipFavorites.push(text);toast('Добавлено в избранное ♡');playSound('click');}
+  save();
+  renderPage('tips');
+}
+
+function tipShuffleOnce(){
+  ensureTipsProData();
+  const skin=data.tipChoice.skin||data.settings.skinType||'normal';
+  const hair=data.tipChoice.hair||data.settings.hairType||'normal';
+  const pool=[...(BIG_LOCAL_TIPS[skin]||[]),...(BIG_HAIR_TIPS[hair]||[])];
+  if(!pool.length)return;
+  const el=document.getElementById('tipShuffleText');
+  if(!el)return;
+  el.textContent=pool[Math.floor(Math.random()*pool.length)];
+  playSound('click');
+}
+
+function tipCopyToClipboard(text){
+  try{
+    navigator.clipboard.writeText(text);
+    toast('Скопировано в буфер ♡');
+  }catch(e){toast('Не удалось скопировать');}
+}
+
+tipsPage=function(){
+  ensureBigData();ensureTipsProData();
+  const focus=data.tipChoice.focus||'all';
+  const skin=data.tipChoice.skin||data.settings.skinType||'normal';
+  const hair=data.tipChoice.hair||data.settings.hairType||'normal';
+  const cat=data.tipChoice.category||'all';
+  const search=(data.tipChoice.search||'').trim().toLowerCase();
+
+  let pool=focus==='skin'?[...(BIG_LOCAL_TIPS[skin]||[])]:focus==='hair'?[...(BIG_HAIR_TIPS[hair]||[])]:[...(BIG_LOCAL_TIPS[skin]||[]),...(BIG_HAIR_TIPS[hair]||[])];
+  let list=pool.map(t=>({text:t,cats:categorizeTipText(t)}));
+  if(cat!=='all')list=list.filter(x=>x.cats.includes(cat));
+  if(search)list=list.filter(x=>x.text.toLowerCase().includes(search));
+  window.__tipsListCache=list;
+
+  const catChips=['all','spf','hydration','cleansing','hair','sensitive','general'];
+  const favList=data.tipFavorites||[];
+  const streak=data.tipStreak||{count:0,best:0,lastDate:''};
+  const doneToday=streak.lastDate===todayKey();
+
+  return `<section class="card hero"><div class="row between wrap"><div><div class="label">Персонализация</div><h1 style="font-family:Georgia,serif;margin:4px 0">💡 Советы именно для тебя</h1><p>Выбирай тип кожи и волос, ищи по теме и сохраняй то, что откликается.</p></div><button class="btn secondary small" id="refreshWebTips">↻ Обновить из интернета</button></div><div class="grid grid-3" style="margin-top:14px"><div class="field"><label>Тип кожи</label><select id="tipSkin">${Object.entries({normal:'Нормальная',dry:'Сухая',oily:'Жирная',combination:'Комбинированная',sensitive:'Чувствительная'}).map(([k,v])=>`<option value="${k}" ${skin===k?'selected':''}>${v}</option>`).join('')}</select></div><div class="field"><label>Тип волос</label><select id="tipHair">${Object.entries({normal:'Нормальные',dry:'Сухие',oily:'Жирные',damaged:'Повреждённые',colored:'Окрашенные'}).map(([k,v])=>`<option value="${k}" ${hair===k?'selected':''}>${v}</option>`).join('')}</select></div><div class="field"><label>Фокус</label><select id="tipFocus"><option value="all" ${focus==='all'?'selected':''}>Кожа + волосы</option><option value="skin" ${focus==='skin'?'selected':''}>Только кожа</option><option value="hair" ${focus==='hair'?'selected':''}>Только волосы</option></select></div></div></section>
+
+<div class="grid grid-2" style="margin-top:16px"><section class="card"><div class="row between"><h3 class="section-title">✨ Совет дня</h3><span class="tag">${streak.count>0?'🔥 '+streak.count+' '+pluralRu(streak.count,'день','дня','дней')+' подряд':'Начни серию сегодня'}</span></div><p style="font-size:18px;line-height:1.7" id="dayTipText">${esc(dynamicTip())}</p><div class="row wrap"><span class="tag">Кожа: ${skinTypeName(skin)}</span><span class="tag">Волосы: ${hairTypeName(hair)}</span>${data.settings.weather?`<span class="tag">${weatherIcon(data.settings.weather.description)} ${data.settings.weather.temp}°</span>`:''}</div><div class="row wrap" style="margin-top:12px"><button class="btn ${doneToday?'secondary':''} small" id="tipMarkDone" ${doneToday?'disabled':''}>${doneToday?'✓ Сегодня отмечено':'✓ Следую совету сегодня'}</button><button class="btn ghost small" id="tipCopyMain">⧉ Скопировать</button></div>${streak.best>0?`<p class="subtle" style="margin-top:8px">Лучшая серия: ${streak.best} ${pluralRu(streak.best,'день','дня','дней')}</p>`:''}</section><section class="card"><div class="row between"><h3 class="section-title">🔀 Ещё один совет</h3><button class="btn secondary small" id="tipShuffleBtn">Показать другой</button></div><p style="font-size:16px;line-height:1.6" id="tipShuffleText" class="subtle">Нажми «Показать другой» — покажу случайный совет из твоей базы.</p></section></div>
+
+<section class="card" style="margin-top:16px"><div class="row between wrap"><h3 class="section-title">🌸 База для твоего типа</h3><span class="tag">${list.length} ${pluralRu(list.length,'совет','совета','советов')}</span></div><div class="field" style="margin:12px 0"><input id="tipSearch" placeholder="Поиск по советам… (например: spf, увлажнение, кончики)" value="${esc(data.tipChoice.search||'')}"></div><div class="chip-tabs" id="tipCatChips">${catChips.map(c=>`<button class="${cat===c?'active':''}" data-tip-cat="${c}">${c==='all'?'Все':TIP_CAT_LABELS[c]}</button>`).join('')}</div><div class="list" style="margin-top:14px">${list.length?list.map((x,i)=>{const isFav=favList.includes(x.text);return `<div class="item"><div class="row between" style="align-items:flex-start;gap:10px"><p style="margin:0;flex:1">${esc(x.text)}</p><button class="btn ghost small" data-tip-fav="${i}" title="В избранное">${isFav?'♥':'♡'}</button></div><div class="row wrap" style="margin-top:6px">${x.cats.map(c=>`<span class="tag">${TIP_CAT_LABELS[c]}</span>`).join('')}</div></div>`}).join(''):'<div class="empty">Ничего не найдено — попробуй другой запрос или фильтр.</div>'}</div></section>
+
+${favList.length?`<section class="card" style="margin-top:16px"><h3 class="section-title">♥ Избранные советы</h3><div class="list">${favList.map((t,i)=>`<div class="item row between"><p style="margin:0;flex:1">${esc(t)}</p><button class="btn ghost small" data-tip-unfav-idx="${i}">Убрать</button></div>`).join('')}</div></section>`:''}
+
+<section class="card" style="margin-top:16px"><div class="row between"><h3 class="section-title">🌐 Что нашлось в интернете</h3><span class="tag">${data.webArticles.length} материалов · ${esc(data.webArticles[0]?.source||'Подборка редакции')}</span></div><div class="grid grid-2" id="webTipsGrid">${data.webArticles.length?data.webArticles.map(webArticleCard).join(''):'<div class="empty" style="grid-column:1/-1">Нажми «Обновить из интернета» — я подберу материалы под твой тип.</div>'}</div><p class="subtle" style="margin-top:12px">Материалы из интернета — это информационная подборка, не медицинская диагностика.</p></section>`;
+};
+
+const __oldBindBigPageTipsPro=bindBigPage;
+bindBigPage=function(route){
+  __oldBindBigPageTipsPro(route);
+  if(route==='tips'){
+    ensureTipsProData();
+    document.getElementById('tipMarkDone')?.addEventListener('click',tipMarkDoneToday);
+    document.getElementById('tipCopyMain')?.addEventListener('click',()=>tipCopyToClipboard(dynamicTip()));
+    document.getElementById('tipShuffleBtn')?.addEventListener('click',tipShuffleOnce);
+    document.querySelectorAll('[data-tip-cat]').forEach(b=>b.onclick=()=>{data.tipChoice.category=b.dataset.tipCat;save();renderPage('tips')});
+    document.querySelectorAll('[data-tip-fav]').forEach(b=>b.onclick=()=>{const idx=Number(b.dataset.tipFav);const item=window.__tipsListCache&&window.__tipsListCache[idx];if(item)toggleTipFavorite(item.text)});
+    document.querySelectorAll('[data-tip-unfav-idx]').forEach(b=>b.onclick=()=>{const idx=Number(b.dataset.tipUnfavIdx);ensureTipsProData();data.tipFavorites.splice(idx,1);save();toast('Убрано из избранного ♡');renderPage('tips')});
+    const searchEl=document.getElementById('tipSearch');
+    if(searchEl){searchEl.oninput=()=>{data.tipChoice.search=searchEl.value;save();renderPage('tips');const ne=document.getElementById('tipSearch');if(ne){ne.focus();ne.setSelectionRange(ne.value.length,ne.value.length)}}}
+  }
+};
+
+
+})();
 </script>
+
 </body>
 </html>
